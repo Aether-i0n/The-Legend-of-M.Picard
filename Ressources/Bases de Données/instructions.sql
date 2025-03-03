@@ -392,7 +392,7 @@ INSERT INTO Arme VALUES
     ('Explosion', 2, 2, 1, 1250, .1875, .625, 10, 0, 0),
     ('Laser', -1, 0, 0, 1000, .0625, 0., 100, 0, 0),
     ('Mur', 0, 0, 0, 2125, .25, .125, 30, 0, 0),
-    ('Liaison', -1, 0, 0, 750, .375, 0., 30, 0, 0),
+    ('Liaison', -1, 0, 0, 625, .375, 0., 30, 0, 0),
     ('Labrys', 0, 0, 0, 1500, .125, 0., 70, 0, 0),
     ('Carre', 0, 0, 0, 1500, .375, 0., 30, 0, 0),
     ('Vecteur', -1, 0, 0, 2750, 0.0625, 0., 40, 0, 0),
@@ -744,10 +744,10 @@ INSERT INTO StatistiqueMonstre VALUES
     ('H2O', 'vitesse_physique', 'maximum', 1000),
     ('H2O', 'vitesse_deplacement', 'maximum', 1000),
     
-    ('Minotaure', 'vie', 'maximum', 500),
+    ('Minotaure', 'vie', 'maximum', 595),
     ('Minotaure', 'vie', 'division', 5),
     ('Minotaure', 'vie', 'regeneration', 0),
-    ('Minotaure', 'puissance_physique', 'maximum', 2000),
+    ('Minotaure', 'puissance_physique', 'maximum', 1682),
     ('Minotaure', 'vitesse_physique', 'maximum', 841),
     ('Minotaure', 'vitesse_deplacement', 'maximum', 1189),
     
