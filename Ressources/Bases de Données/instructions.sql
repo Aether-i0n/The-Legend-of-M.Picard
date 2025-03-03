@@ -1250,7 +1250,7 @@ INSERT INTO Interaction VALUES
     ('Musique', 'PhCh', .67),
     ('Musique', 'SVT', .67),
     ('Musique', 'Musique', 1.5),
-    ('Musique', 'Arts', 0),
+    ('Musique', 'Arts', .5),
     ('Arts', 'Maths', .67),
     ('Arts', 'Musique', .67),
     ('Arts', 'Arts', 1.5),
