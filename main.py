@@ -3473,7 +3473,6 @@ class SélectionPersonnage(Scène):
         Initialise les Boutons des personnages du menu de Sélection du Personnage `self`. """
 
         personnages: list[tuple[str]] = exécuter_sql(f"""SELECT nom FROM Personnage;""")
-        random.shuffle(personnages)
         nombre_personnage = len(personnages)
 
         self.boutons_personnages: list[Bouton] = []
