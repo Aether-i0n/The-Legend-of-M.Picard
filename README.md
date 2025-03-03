@@ -1,6 +1,6 @@
 # The Legend of M.Picard.
 
-Ce projet est un jeu d'aventure inspiré du fameux jeu "*Piotr, l'explorateur de labyrinthes*" développé avec la bibliothèque graphique *Pygame* et du module *SQLite* qui permet l'accès à une interface SQL. L'objectif de ce projet est de ... tout en rendant homage à ce jeu oublié, codé en seulement six petites heures.
+Ce projet est un jeu d'aventure inspiré du fameux jeu "*Piotr, l'explorateur de labyrinthes*" développé avec la bibliothèque graphique *Pygame* et du module *SQLite* qui permet l'accès à une interface SQL. L'objectif de ce projet est d'utiliser les notions vues en cours ce trimestre, notamment le SQL, pour construire un jeu vidéo ; tout en rendant homage à ce jeu oublié, codé en seulement six petites heures.
 
 ##  Installation des outils nécessaires
 
@@ -161,6 +161,6 @@ aucun bug connu
 
 ##  Évolutions possibles
 
-- Ajouter un système de sauvegarde de données à l'aide du SQL.
+- Ajouter un système de sauvegarde de données à l'aide de SQL.
 - Ajouter des descriptions pour chacun des personnages.
 - Ajouter d'autres systèmes d'amélioration du personnage pour compléter les Récompenses et l'écran d'Amélioration.
