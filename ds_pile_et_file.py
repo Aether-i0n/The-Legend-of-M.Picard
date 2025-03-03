@@ -108,6 +108,14 @@ class File:
         if self.est_vide():
             raise AttributeError("Impossible de récupérer la tête : la file est vide")
         return self.debut.valeur
+    
+    def queue(self):
+        """ File -> int
+        Renvoie la valeur du dernier élément de la File `self` sans la modifier. """
+
+        if self.est_vide():
+            raise AttributeError("Impossible de récupérer la queue : la file est vide")
+        return self.fin.valeur
 
     def __str__(self):
         """ self -> str
