@@ -2704,7 +2704,7 @@ class Joueur(Entité):
                 armes = exécuter_sql(f"""SELECT nom FROM Arme""")
 
                 arme = random.choice(armes)[0]
-                while arme.nom in ["Cadeau", "Soin"] or exécuter_sql(f"""SELECT COUNT(*) FROM Projectile WHERE nom = '{arme}';""")[0][0] > 0:
+                while arme in ["Cadeau", "Soin"] or exécuter_sql(f"""SELECT COUNT(*) FROM Projectile WHERE nom = '{arme}';""")[0][0] > 0:
                     arme = random.choice(armes)[0]
 
                 self.inventaire.enfiler(Arme(arme))
