@@ -1658,7 +1658,7 @@ class GestionnaireStatistiques:
                 valeur = sql[0][0]
 
                 if sous_catégorie == 'maximum':
-                    maximum = round(valeur * 1.1**(difficulté_monde/6))
+                    maximum = round(valeur * 1.1**(difficulté_monde/6) * ({"vie": 3, "puissance_physique": 2.25, "vitesse_physique": 1.5, "vitesse_deplacement": 1.75}[catégorie] if type(entité) is Joueur else 1))
                     if type(entité) is Boss and catégorie == "vie":
                         maximum *= 10
                 

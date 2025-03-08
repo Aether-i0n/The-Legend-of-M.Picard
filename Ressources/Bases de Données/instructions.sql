@@ -397,7 +397,7 @@ INSERT INTO Arme VALUES
     ('Carre', 0, 0, 0, 1500, .375, 0., 30, 0, 0),
     ('Vecteur', -1, 0, 0, 2750, 0.0625, 0., 40, 0, 0),
     ('Pages', 0, 0, 0, 0, 0, 0., 40, 1, 0),
-    ('Page', 0, 0, 0, 3000, 0.0625, 0., 100, 0, 0),
+    ('Page', 0, 0, 0, 2250, 0.0625, 0., 100, 0, 0),
     ('Dessin', -1, 0, 0, 750, .125, 0., 120, 0, 0),
     ('Obscurite', 0, 0, 1, 750, .4415, .25, 50, 0, 0),
     ('Chimie', 0, 0, 0, 0, 0, 0., 30, 3, 0),
@@ -407,7 +407,7 @@ INSERT INTO Arme VALUES
     ('Son', 0, 0, 0, 1250, .0625, 0., 65, 0, 0),
     ('Invocation', 0, 0, 0, 0, .0625, 0., 5, 0, 3),
     ('InvocationBoss', 0, 0, 0, 0, .0625, 0., 7, 0, 5),
-    ('Lance', -1, 0, 0, 1875, .0625, 0., 120, 0, 0),
+    ('Lance', -1, 0, 0, 1500, .0625, 0., 125, 0, 0),
     ('Roulade', -1, 0, 0, 1250, .375, 0., 120, 0, 0),
     ('Poing', -1, 0, 0, 1250, .0625, 0., 250, 0, 0),
     ('Feuilles', 0, 0, 0, 0, 0, 0., 55, 1, 0),
@@ -1194,12 +1194,12 @@ INSERT INTO MondePersonnage VALUES
     ('Mark Twain', 'Anglais');
 
 INSERT INTO StatistiquePersonnage VALUES
-    ('Yann', 'vie', 'maximum', 2250),
+    ('Yann', 'vie', 'maximum', 1000),
     ('Yann', 'vie', 'division', 4),
-    ('Yann', 'vie', 'regeneration', 4),
-    ('Yann', 'puissance_physique', 'maximum', 2250),
-    ('Yann', 'vitesse_physique', 'maximum', 1750),
-    ('Yann', 'vitesse_deplacement', 'maximum', 1750);
+    ('Yann', 'vie', 'regeneration', 5),
+    ('Yann', 'puissance_physique', 'maximum', 1000),
+    ('Yann', 'vitesse_physique', 'maximum', 1000),
+    ('Yann', 'vitesse_deplacement', 'maximum', 1000);
 
 INSERT INTO ArmePersonnage VALUES
     ('Yann', 'Molotov'),
