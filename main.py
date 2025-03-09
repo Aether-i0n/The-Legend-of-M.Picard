@@ -2602,7 +2602,7 @@ class Joueur(Entité):
             
             self.armes = [arme]
         
-        # self.armes = [Arme("Explosion")]
+        # self.armes = [Arme("Mur")]
     
     def initialiser_monde(self):
         """ Joueur -> None
@@ -2798,7 +2798,7 @@ class Projectile:
 
         if chronomètre.temps_écoulé() - self.début_attaque >= self.durée:
             
-            attaques.ajouter(Attaque(round(self.x / taille_case) * taille_case, round(self.y / taille_case) * taille_case, self.puissance * max(1,joueur.enchantements.possède_enchant(17)*distance((self.x, self.y),(self.x_départ,self.y_départ))/3), self.durée, self.attente, self.monde, immunisés=self.immunisés, effets=self.effets, attaquant=self.attaquant))
+            attaques.ajouter(Attaque(round(self.x / taille_case) * taille_case, round(self.y / taille_case) * taille_case, self.puissance * (max(1, distance((self.x, self.y), (self.x_départ, self.y_départ)) / (3 * taille_case)) if joueur.enchantements.possède_enchant(17) else 1), self.durée, self.attente, self.monde, immunisés=self.immunisés, effets=self.effets, attaquant=self.attaquant))
 
             particules.ajouter(Particule(self.x, self.y, self.particule, self.durée, direction=self.direction, nom_arme=self.nom))
             
