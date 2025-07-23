@@ -1011,6 +1011,17 @@
         "tu": "Bir Karakter Seç",
         "la": "Opta Personam"
     },
+    "Sélectionne une Difficulté": {
+        "fr": "Sélectionne une Difficulté",
+        "fr-drôle": "Choisis ton niveau de galère",
+        "fr-scientifique": "Définis le paramètre de difficulté",
+        "en": "Select a Difficulty",
+        "en-p": "Pick yer peril",
+        "de": "Wähle einen Schwierigkeitsgrad",
+        "cn": "选择难度",
+        "tu": "Bir Zorluk Seviyesi Seç",
+        "la": "Opta Gradum Difficultatis"
+    },
     "Marie Curie": {
         "fr": "Marie Curie",
         "fr-drôle": "Marie Curie",
@@ -2043,6 +2054,72 @@
         "cn": "重新抽取",
         "tu": "Yeniden Çevir",
         "la": "Iterum volvere"
+    },
+    "Débutant": {
+        "fr": "Débutant",
+        "fr-drôle": "Touriste",
+        "fr-scientifique": "Novice",
+        "en": "Beginner",
+        "en-p": "Greenhorn",
+        "de": "Anfänger",
+        "cn": "初学者",
+        "tu": "Başlangıç",
+        "la": "Novicius"
+    },
+    "Intermédiaire": {
+        "fr": "Intermédiaire",
+        "fr-drôle": "Apprenti",
+        "fr-scientifique": "Moyen",
+        "en": "Intermediate",
+        "en-p": "Deckhand",
+        "de": "Fortgeschritten",
+        "cn": "中级",
+        "tu": "Orta",
+        "la": "Intermedius"
+    },
+    "Avancé": {
+        "fr": "Avancé",
+        "fr-drôle": "Pro",
+        "fr-scientifique": "Confirmé",
+        "en": "Advanced",
+        "en-p": "Old Salt",
+        "de": "Fortgeschritten",
+        "cn": "高级",
+        "tu": "İleri",
+        "la": "Provectus"
+    },
+    "Expert": {
+        "fr": "Expert",
+        "fr-drôle": "Puant",
+        "fr-scientifique": "Spécialiste",
+        "en": "Expert",
+        "en-p": "Sea Dog",
+        "de": "Experte",
+        "cn": "专家",
+        "tu": "Uzman",
+        "la": "Peritus"
+    },
+    "Court": {
+        "fr": "Court",
+        "fr-drôle": "Blitz",
+        "fr-scientifique": "Minoré",
+        "en": "Short",
+        "en-p": "Short",
+        "de": "Kurz",
+        "cn": "短",
+        "tu": "Kısa",
+        "la": "Brevis"
+    },
+    "Long": {
+        "fr": "Long",
+        "fr-drôle": "Différé",
+        "fr-scientifique": "Majoré",
+        "en": "Long",
+        "en-p": "Long",
+        "de": "Lang",
+        "cn": "长",
+        "tu": "Uzun",
+        "la": "Longus"
     },
     "": {
         "fr": "",

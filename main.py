@@ -655,6 +655,7 @@ class Jeu:
             "ChoixLangue": ChoixLangue(),
             "Intro": Cinématique("Intro"),
             "Menu": Menu(),
+            "SélectionDifficulté": SélectionDifficulté(),
             "SélectionPersonnage": SélectionPersonnage(),
             "Partie": Partie(),
             "Niveau": Niveau(),
@@ -1634,6 +1635,8 @@ class GestionnaireStatistiques:
             self.puissance_physique = self.initialiser_statistique(entité, "puissance_physique")
             self.vitesse_physique = self.initialiser_statistique(entité, "vitesse_physique")
             self.vitesse_déplacement = self.initialiser_statistique(entité, "vitesse_deplacement")
+            # if type(entité) is Boss:
+            #     print(f"{difficulté_monde} - {self.vie.valeur}pv {self.puissance_physique.valeur}dps {self.vitesse_physique.valeur}coup.s-1 {self.vitesse_déplacement.valeur}case.s-1")
     
     def initialiser_statistique(self, entité: Entité, catégorie: str):
         """ GestionnaireStatistiques, Entité, str -> None
@@ -1658,17 +1661,23 @@ class GestionnaireStatistiques:
                 valeur = sql[0][0]
 
                 if sous_catégorie == 'maximum':
-                    maximum = round(valeur * 1.1**(difficulté_monde/6) * ({"vie": 3, "puissance_physique": 2.25, "vitesse_physique": 1.5, "vitesse_deplacement": 1.75}[catégorie] if type(entité) is Joueur else 1))
+                    maximum = round(valeur * 1.1**(difficulté_monde/6) * (1 + ({"vie": 1.75, "puissance_physique": 1., "vitesse_physique": 0., "vitesse_deplacement": .5}[catégorie] * (3 - difficulté) / 3) if type(entité) is Joueur else 1.))
                     if type(entité) is Boss and catégorie == "vie":
                         maximum *= 10
                 
                 elif sous_catégorie == 'division':
-                    division = valeur
+                    if type(entité) is Joueur and catégorie == "vie":
+                        division = 5 - difficulté
+                    else:
+                        division = valeur
                 
                 elif sous_catégorie == 'regeneration':
                     régénération = valeur
-                    if type(entité) is Boss and catégorie == "vie":
-                        régénération = 0
+                    if catégorie == "vie":
+                        if type(entité) is Boss:
+                            régénération = 0
+                        elif type(entité) is Joueur:
+                            régénération = 4 - difficulté
                 
                 elif sous_catégorie == 'valeur_depart':
                     valeur_départ = valeur
@@ -2073,7 +2082,7 @@ class GestionnaireEntités:
                 if salle.boss:
                     self.ajouter_monstre(x, y, salle, boss=True)
                 elif salle.est_dangereuse():
-                    for _ in range(math.ceil(salle.difficulté / 2)):
+                    for _ in range(math.ceil(salle.difficulté / 2.5)):
                         self.ajouter_monstre(x, y, salle)
                 else:
                     self.ajouter_joueur(x, y, salle)
@@ -2507,14 +2516,14 @@ class Monstre(Entité):
         if type(self) is Boss and joueur.salle != self.salle:
             return
 
-        if chronomètre.temps_écoulé() - self.début_attaque >= 30000 / self.statistiques.vitesse_physique.valeur / self.arme.vitesse / (1.25 if self.effets.contient("Obscurite") else 1) * (1.25 if self.effets.contient("Froid") else 1):
+        if chronomètre.temps_écoulé() - self.début_attaque >= 60000 / self.statistiques.vitesse_physique.valeur / self.arme.vitesse / (1.25 if self.effets.contient("Obscurite") else 1) * (1.25 if self.effets.contient("Froid") else 1):
 
             joueur_x, joueur_y = joueur.coordonnées_affichage()
 
             if not self.salle.est_visible(self.x // taille_salle, self.y // taille_salle):
                 return
 
-            if  (self.effets.contient("Obscurite") or self.arme.nom == "Sel") or ((self.arme.puissance == 0 or self.joueur_à_portée()) and distance(self.coordonnées_affichage(), (joueur_x, joueur_y)) <= 6 * taille_case):
+            if  (self.effets.contient("Obscurite") or self.arme.nom == "Sel") or ((self.arme.puissance == 0 or self.joueur_à_portée() or (type(self) is Boss and (.5 / horloge.get_fps()) >= random.random())) and distance(self.coordonnées_affichage(), (joueur_x, joueur_y)) <= 6 * taille_case):
                 self.attaquer(joueur_x, joueur_y)
                 self.inventaire.enfiler(self.inventaire.defiler())
                 self.arme = self.inventaire.tete()
@@ -2602,7 +2611,7 @@ class Joueur(Entité):
             
             self.armes = [arme]
         
-        # self.armes = [Arme("Mur")]
+        # self.armes = [Arme("Feuilles")]
     
     def initialiser_monde(self):
         """ Joueur -> None
@@ -2689,7 +2698,7 @@ class Joueur(Entité):
         """ Joueur -> None
         Gère l'attaque du Joueur `self`. """
 
-        if souris_pressée and chronomètre.temps_écoulé() - self.début_attaque >= 30000 / self.statistiques.vitesse_physique.valeur / self.arme.vitesse:
+        if souris_pressée and chronomètre.temps_écoulé() - self.début_attaque >= 60000 / self.statistiques.vitesse_physique.valeur / self.arme.vitesse:
 
             if self.arme.nom == "Soin" and self.inventaire.longueur() > 1:
                 partie = self.statistiques.vie.maximum / self.statistiques.vie.division
@@ -2738,6 +2747,9 @@ class Projectile:
 
         self.x = x
         self.y = y
+
+        self.dernier_x = x
+        self.dernier_y = y
 
         self.x_départ = x
         self.y_départ = y
@@ -2797,12 +2809,24 @@ class Projectile:
             self.effets["Froid"] = max(self.effets.get("Froid",0), 2000)
 
         if chronomètre.temps_écoulé() - self.début_attaque >= self.durée:
+
+            continuité_x = round((self.x + self.dernier_x) / 2 / taille_case) * taille_case
+            continuité_y = round((self.y + self.dernier_y) / 2 / taille_case) * taille_case
+
+            x = round(self.x / taille_case) * taille_case
+            y = round(self.y / taille_case) * taille_case
+
+            if continuité_x != x or continuité_y != y:
+                attaques.ajouter(Attaque(continuité_x, continuité_y, self.puissance * (max(1, distance((self.x, self.y), (self.x_départ, self.y_départ)) / (3 * taille_case)) if joueur.enchantements.possède_enchant(17) else 1), self.durée, self.attente, self.monde, immunisés=self.immunisés, effets=self.effets, attaquant=self.attaquant))
             
-            attaques.ajouter(Attaque(round(self.x / taille_case) * taille_case, round(self.y / taille_case) * taille_case, self.puissance * (max(1, distance((self.x, self.y), (self.x_départ, self.y_départ)) / (3 * taille_case)) if joueur.enchantements.possède_enchant(17) else 1), self.durée, self.attente, self.monde, immunisés=self.immunisés, effets=self.effets, attaquant=self.attaquant))
+            attaques.ajouter(Attaque(x, y, self.puissance * (max(1, distance((self.x, self.y), (self.x_départ, self.y_départ)) / (3 * taille_case)) if joueur.enchantements.possède_enchant(17) else 1), self.durée, self.attente, self.monde, immunisés=self.immunisés, effets=self.effets, attaquant=self.attaquant))
 
             particules.ajouter(Particule(self.x, self.y, self.particule, self.durée, direction=self.direction, nom_arme=self.nom))
             
             self.début_attaque = chronomètre.temps_écoulé()
+        
+        self.dernier_x = self.x
+        self.dernier_y = self.y
 
 class GestionnaireProjectiles:
     """ Gère la liste des Projectiles. """
@@ -3426,7 +3450,7 @@ class Menu(Scène):
                 if self.boutons["Jouer"].bouton_touché():
                     jouer_son("Sélection")
                     global scène
-                    scène = "SélectionPersonnage"
+                    scène = "SélectionDifficulté"
                 if self.boutons["Paramètres"].bouton_touché():
                     jouer_son("Sélection")
                     scène = "Paramètres"
@@ -3444,6 +3468,114 @@ class Menu(Scène):
         afficher(self.image_fond, (0, 0))
 
         self.afficher_boutons()
+
+class SélectionDifficulté(Scène):
+    """ Représente le menu de Sélection de la Difficulté. """
+
+    def initialiser(self):
+        """ SélectionDifficulté -> None
+        Initialise le menu de Sélection de la Difficulté `self`. """
+
+        self.boutons = {
+            "Titre": Bouton("Titre", "Sélectionne une Difficulté", superposition=False, animation=2., durées_états=[.5, float("inf")], center=(taille_fenêtre//2, taille_fenêtre//5)),
+            "Paramètres": Bouton("Moyen", "Paramètres", durées_états=[1.5, float("inf")], bottomleft=(0, taille_fenêtre)),
+            "Menu": Bouton("Moyen", "Menu", durées_états=[1.5, float("inf")], bottomright=(taille_fenêtre, taille_fenêtre)),
+            "Jouer": Bouton("Gros", "Jouer", durées_états=[1., float("inf")], center=(taille_fenêtre//2, 4*taille_fenêtre//5))
+        }
+
+        self.difficultés = ["Débutant", "Intermédiaire", "Avancé", "Expert"]
+
+        self.boutons_difficulté = [
+            Bouton("Moyen", self.difficultés[i], color=((255 - 16*(3-i)), (255 - 16*i), 191), fond_sélection=((255 - 16*(3-i)), (255 - 16*i), 191, 96), durées_états=[.5, float("inf")], center=(taille_fenêtre//8*(2*i+1), taille_fenêtre//2))
+            for i in range(4)
+        ]
+
+        self.difficulté = 0
+
+        self.durées = ["Court", "Moyen", "Long"]
+
+        self.boutons_durée = [
+            Bouton("Moyen", self.durées[i], color=((255 - 16*i), (255 - 16*(3-i)), 255), fond_sélection=((255 - 16*i), (255 - 16*(3-i)), 255, 96), durées_états=[.5, float("inf")], center=(taille_fenêtre//6*(2*i+1), 3*taille_fenêtre//5))
+            for i in range(3)
+        ]
+
+        self.durée = 1
+
+        self.image_fond = charger_image("Interface Utilisateur/Menu", taille_fenêtre, taille_fenêtre)
+
+        jouer_musique(nom="Menu")
+
+    def modifier_boutons(self):
+        """ SélectionDifficulté -> None
+        Modifie le texte des boutons du menu de Sélection de la Difficulté `self`. """
+
+        for bouton in self.boutons.values():
+            bouton.changer_langue()
+        
+        for bouton_difficulté in self.boutons_difficulté:
+            bouton_difficulté.changer_langue()
+
+    def action(self):
+        """ SélectionDifficulté -> None
+        Gère le menu de Sélection de la Difficulté `self`. """
+
+        self.boucle_événements()
+
+        self.afficher()
+
+    def boucle_événements(self):
+        """ SélectionDifficulté -> None
+        Gère la boucle des événements de pygame pour le menu de Sélection de la Difficulté `self`. """
+
+        for événement in pygame.event.get():
+            if fenêtre_fermée(événement):
+                quitter()
+            
+            elif souris_est_pressée(événement):                
+                if self.boutons["Paramètres"].bouton_touché():
+                    jouer_son("Sélection")
+                    global scène
+                    scène = "Paramètres"
+
+                elif self.boutons["Menu"].bouton_touché():
+                    jouer_son("Retour")
+                    scène = "Menu"
+                
+                elif self.boutons["Jouer"].bouton_touché():
+                    données_scène_suivante["difficulté"] = self.difficulté
+                    données_scène_suivante["durée"] = self.durée
+                    scène = "SélectionPersonnage"
+                
+                else:
+                    for i, bouton_difficulté in enumerate(self.boutons_difficulté):
+                        if bouton_difficulté.bouton_touché():
+                            jouer_son("Sélection")
+                            self.difficulté = i
+                    
+                    for i, bouton_durée in enumerate(self.boutons_durée):
+                        if bouton_durée.bouton_touché():
+                            jouer_son("Sélection")
+                            self.durée = i
+                
+                jouer_son("Clique")
+            
+            elif souris_déplacée(événement):
+                global position_souris
+                position_souris = événement.pos
+
+    def afficher(self):
+        """ SélectionDifficulté -> None
+        Affiche le menu de Sélection de la Difficulté `self`. """
+
+        afficher(self.image_fond, (0, 0))
+
+        self.afficher_boutons()
+
+        for bouton_difficulté in self.boutons_difficulté:
+            bouton_difficulté.afficher(sélectionné=(self.difficultés[self.difficulté] == bouton_difficulté.texte_original))
+
+        for bouton_durée in self.boutons_durée:
+            bouton_durée.afficher(sélectionné=(self.durées[self.durée] == bouton_durée.texte_original))
 
 class SélectionPersonnage(Scène):
     """ Représente le menu de Sélection du Personnage. """
@@ -3465,6 +3597,9 @@ class SélectionPersonnage(Scène):
         self.page = 0
 
         self.initialiser_boutons_personnages()
+
+        self.difficulté = données_scène_suivante["difficulté"]
+        self.durée = données_scène_suivante["durée"]
 
         jouer_musique(nom="Menu")
 
@@ -3511,6 +3646,8 @@ class SélectionPersonnage(Scène):
                     if i // 28 == self.page and bouton.bouton_touché():
                         global scène
                         données_scène_suivante["joueur"] = bouton.texte
+                        données_scène_suivante["difficulté"] = self.difficulté
+                        données_scène_suivante["durée"] = self.durée
                         scène = "Partie"
                 
                 if self.boutons["Paramètres"].bouton_touché():
@@ -3660,20 +3797,22 @@ class Partie(Scène):
 
         global difficulté_monde
         difficulté_monde = 0
+        
+        global difficulté, durée, joueur
+        difficulté = int(données_scène_suivante["difficulté"])
+        durée = int(données_scène_suivante["durée"])
+        joueur = Joueur(données_scène_suivante["joueur"], 0, 0, None)
 
         sql: list[tuple[str]] = exécuter_sql(f"""SELECT nom FROM Monde;""")
         random.shuffle(sql)
 
         self.mondes = Pile()
 
-        for monde in sql:
-            self.mondes.empiler(monde[0])
+        for i in range(3 + 2 * difficulté + 3 * durée):
+            self.mondes.empiler(sql[i][0])
 
         # global monde
         # monde = "Musique"
-        
-        global joueur
-        joueur = Joueur(données_scène_suivante["joueur"], 0, 0, None)
 
         global gold
         gold = 5
@@ -5112,8 +5251,8 @@ class Récompense(Scène):
                             if bouton.texte == "régénération":
                                 joueur.statistiques.vie.régénération = max(joueur.statistiques.vie.régénération + 1, round(joueur.statistiques.vie.régénération * 1.1))
                             else:
-                                getattr(joueur.statistiques, bouton.texte).maximum = max(getattr(joueur.statistiques, bouton.texte).maximum + 420, round(getattr(joueur.statistiques, bouton.texte).maximum * 1.1))
-                                getattr(joueur.statistiques, bouton.texte).valeur = max(getattr(joueur.statistiques, bouton.texte).valeur + 420, round(getattr(joueur.statistiques, bouton.texte).valeur * 1.1))
+                                getattr(joueur.statistiques, bouton.texte).maximum = max(getattr(joueur.statistiques, bouton.texte).maximum + 100, round(getattr(joueur.statistiques, bouton.texte).maximum * 1.1))
+                                getattr(joueur.statistiques, bouton.texte).valeur = max(getattr(joueur.statistiques, bouton.texte).valeur + 100, round(getattr(joueur.statistiques, bouton.texte).valeur * 1.1))
                         elif self.type == "Enclume":
                             joueur.inventaire.enfiler(Arme("GlaceEpee"))
 
