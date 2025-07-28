@@ -5250,7 +5250,10 @@ class Récompense(Scène):
                     jouer_musique()
 
                     gold += 2 +joueur.enchantements.possède_enchant(4)
-
+                    
+                    joueur.effets.contenu = []
+                    partie = joueur.statistiques.vie.maximum / joueur.statistiques.vie.division
+                    joueur.statistiques.vie.valeur = min((joueur.statistiques.vie.valeur - 1.02) // partie * partie + partie, joueur.statistiques.vie.maximum)
                     actualiser_nouvelle_scène, scène = False, "Niveau"
                 
                 for bouton in self.boutons:
@@ -5271,6 +5274,9 @@ class Récompense(Scène):
 
                         jouer_son("Sélection")
 
+                        joueur.effets.contenu = []
+                        partie = joueur.statistiques.vie.maximum / joueur.statistiques.vie.division
+                        joueur.statistiques.vie.valeur = min((joueur.statistiques.vie.valeur - 1.02) // partie * partie + partie, joueur.statistiques.vie.maximum)
                         actualiser_nouvelle_scène, scène = False, "Niveau"
                 
                 jouer_son("Clique")
