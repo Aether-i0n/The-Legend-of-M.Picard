@@ -281,7 +281,7 @@ def jouer_musique(nom: str = None, volume: float = 1.0):
     Joue la musique de `nom` donné avec le `volume` donné.
     Si c'est None, continue la même musique. """
 
-    global musique
+    global musique, volumes
 
     if nom == "":
         pygame.mixer.music.pause()
@@ -290,9 +290,9 @@ def jouer_musique(nom: str = None, volume: float = 1.0):
 
         return
 
-    pygame.mixer.music.set_volume(volume * liste_paramètres.recupérer_paramètre("audio_musique") * liste_paramètres.recupérer_paramètre("audio_global") / 10000)
-
     if nom is not None and nom != musique:
+        pygame.mixer.music.set_volume(volume * liste_paramètres.recupérer_paramètre("audio_musique") * liste_paramètres.recupérer_paramètre("audio_global") / 10000 * volumes["Musiques"][nom])
+        
         pygame.mixer.music.load(f"Ressources/Audio/Musiques/{nom}.mp3")
         pygame.mixer.music.play(-1)
 
@@ -304,7 +304,7 @@ def jouer_son(nom: str):
 
     global sons, volumes
 
-    sons[nom].set_volume(volumes[nom] * liste_paramètres.recupérer_paramètre("audio_son") * liste_paramètres.recupérer_paramètre("audio_global") / 10000)
+    sons[nom].set_volume(volumes["Sons"][nom] * liste_paramètres.recupérer_paramètre("audio_son") * liste_paramètres.recupérer_paramètre("audio_global") / 10000)
     sons[nom].play()
 
 def copier_class(obj):
@@ -622,18 +622,30 @@ class Jeu:
         })
 
         global volumes
-        volumes = dict[str, float]({
-            "Clique": .75,
-            "Défiler": 1.,
-            "Dégât": .5,
-            "Mort": 1.,
-            "Ouvrir": 1.,
-            "Sélection": .5,
-            "Retour": .5,
-            "Destruction": .125,
-            "Attaque": .75,
-            "Effet": .25,
-            "Totem" : .7
+        volumes = dict[str, dict[str, float]]({
+            "Musiques": {
+                "Boss": 1.,
+                "Cinématique": 1.5,
+                "Donjon": 1.,
+                "i've won...... but at what cost": 1.25,
+                "M.Picard": .75,
+                "Menu": 1.,
+                "Parcoursup": 2.
+            },
+            "Sons": {
+                "Clique": .75,
+                "Défiler": 1.,
+                "Dégât": .5,
+                "Mort": 1.,
+                "Ouvrir": 1.,
+                "Sélection": .5,
+                "Retour": .5,
+                "Destruction": .125,
+                "Attaque": .75,
+                "Effet": .25,
+                "Totem" : .7
+            }
+
         })
 
         global effets
