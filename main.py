@@ -1958,51 +1958,59 @@ class Entité:
                         break
 
             if not obstacle:
-                for case_x, case_y in self.arme.modèle:
 
-                    direction = math.atan2(case_y - centre_y, case_x - centre_x)
-                    dist = distance((case_x, case_y), (centre_x, centre_y))
+                coordonnées_finales = [(origine_x, origine_y)]
+                coordonnées_finales.extend([(origine_x + random.uniform(-taille_case, taille_case), (origine_y + random.uniform(-taille_case, taille_case))) for _ in range(self.arme.dispersion)])
+                for origine_x, origine_y in coordonnées_finales:
 
-                    for i in range(1, int(dist) + 1):
-                        x = round(origine_x / taille_case + i * math.cos(direction_initiale + direction))
-                        y = round(origine_y / taille_case + i * math.sin(direction_initiale + direction))
+                    for case_x, case_y in self.arme.modèle:
 
-                        salle = donjon.récupérer(x // taille_salle, y // taille_salle)
-                        case = salle.récupérer(x % taille_salle, y % taille_salle)
+                        direction = math.atan2(case_y - centre_y, case_x - centre_x)
+                        dist = distance((case_x, case_y), (centre_x, centre_y))
 
-                        if case.collision:
-                            break
-                    
-                    else:
-                        x_final = round(origine_x / taille_case + dist * math.cos(direction_initiale + direction)) * taille_case
-                        y_final = round(origine_y / taille_case + dist * math.sin(direction_initiale + direction)) * taille_case
+                        for i in range(1, int(dist) + 1):
+                            x = round(origine_x / taille_case + i * math.cos(direction_initiale + direction))
+                            y = round(origine_y / taille_case + i * math.sin(direction_initiale + direction))
 
-                        if possède_améliorations(self.enchantements, [3, 2003, 1003]):
-                            effets["Intoxication"] = max(effets.get("Intoxication",0), 2000 * nombre_améliorations(self.enchantements, [3, 2003, 1003]))
+                            salle = donjon.récupérer(x // taille_salle, y // taille_salle)
+                            case = salle.récupérer(x % taille_salle, y % taille_salle)
+
+                            if case.collision:
+                                break
                         
-                        if possède_améliorations(self.enchantements, [11]):
-                            effets["Liaison"] = max(effets.get("Liaison",0), 2000)
+                        else:
+                            x_final = round(origine_x / taille_case + dist * math.cos(direction_initiale + direction)) * taille_case
+                            y_final = round(origine_y / taille_case + dist * math.sin(direction_initiale + direction)) * taille_case
 
-                        if possède_améliorations(self.enchantements, [10]):
-                            effets["Froid"] = max(effets.get("Froid",0), 2000)
+                            if possède_améliorations(self.enchantements, [3, 2003, 1003]):
+                                effets["Intoxication"] = max(effets.get("Intoxication",0), 2000 * nombre_améliorations(self.enchantements, [3, 2003, 1003]))
                             
-                        cout_critique = 1.
-                        chiffre = random.uniform(0, 1)
-                        if chiffre >= 1. - nombre_améliorations(self.enchantements, [1, 2001, 1001]) * 0.2 and type(self) is Joueur and possède_améliorations(self.enchantements, [1, 2001, 1001]):
-                            cout_critique = 1.2
-                        dégat = cout_critique * self.arme.puissance * self.statistiques.puissance_physique.valeur / 1000 * (1.25 if (isinstance(self, Monstre) and self.effets.contient("Obscurite")) else 1)
-                        attaques.ajouter(Attaque(x_final, y_final, dégat, self.arme.durée, self.arme.attente, self.arme.monde, immunisés={type(self)}, effets=effets, attaquant=self))
-                        if possède_amélioration(self.enchantements, 14):
-                            attaques.ajouter(Attaque(x_final, y_final, dégat, self.arme.durée, self.arme.attente, self.arme.monde, immunisés={type(self)}, effets=effets, attaquant=self))
-                        if liste_paramètres.recupérer_paramètre("show_number_damage"):
-                            global affichage_dégat
+                            if possède_améliorations(self.enchantements, [11]):
+                                effets["Liaison"] = max(effets.get("Liaison",0), 2000)
+
+                            if possède_améliorations(self.enchantements, [10]):
+                                effets["Froid"] = max(effets.get("Froid",0), 2000)
+                                
+                            cout_critique = 1.
+                            chiffre = random.uniform(0, 1)
+                            if chiffre >= 1. - nombre_améliorations(self.enchantements, [1, 2001, 1001]) * 0.2 and type(self) is Joueur and possède_améliorations(self.enchantements, [1, 2001, 1001]):
+                                cout_critique = 1.2
                             dégat = cout_critique * self.arme.puissance * self.statistiques.puissance_physique.valeur / 1000 * (1.25 if (isinstance(self, Monstre) and self.effets.contient("Obscurite")) else 1)
-                            affichage_dégat.append(Bouton("Mini",f"§{str(dégat)}§", color=(255*(cout_critique!=1),40**(cout_critique!=1),40**(cout_critique!=1)), center = (x_final, y_final),durées_états=[0.5, 1, 0.3, float("inf")]))
+                            
+                            attaques.ajouter(Attaque(x_final, y_final, dégat, self.arme.durée, self.arme.attente, self.arme.monde, immunisés={type(self)}, effets=effets, attaquant=self))
+                            
+                            if possède_amélioration(self.enchantements, 14):
+                                attaques.ajouter(Attaque(x_final, y_final, dégat, self.arme.durée, self.arme.attente, self.arme.monde, immunisés={type(self)}, effets=effets, attaquant=self))
+                            if liste_paramètres.recupérer_paramètre("show_number_damage"):
+                                global affichage_dégat
+                                dégat = cout_critique * self.arme.puissance * self.statistiques.puissance_physique.valeur / 1000 * (1.25 if (isinstance(self, Monstre) and self.effets.contient("Obscurite")) else 1)
+                                affichage_dégat.append(Bouton("Mini",f"§{str(dégat)}§", color=(255*(cout_critique!=1),40**(cout_critique!=1),40**(cout_critique!=1)), center = (x_final, y_final),durées_états=[0.5, 1, 0.3, float("inf")]))
+                
+                    particules.ajouter(Particule(int((origine_x + taille_case/2) / taille_case) * taille_case, int((origine_y + taille_case/2) / taille_case) * taille_case, self.arme.particule, self.arme.attente + self.arme.durée, direction=direction_initiale, nom_arme=self.arme.nom))
 
             if self.arme.centrée_joueur:
                 direction_initiale = 0.
 
-            particules.ajouter(Particule(int((origine_x + taille_case/2) / taille_case) * taille_case, int((origine_y + taille_case/2) / taille_case) * taille_case, self.arme.particule, self.arme.attente + self.arme.durée, direction=direction_initiale, nom_arme=self.arme.nom))
 
         for i in range(self.arme.projectiles):
             nom, vitesse = random.choice(exécuter_sql(f"""SELECT nom, vitesse FROM Projectile WHERE arme = '{self.arme.nom}';"""))
@@ -2612,7 +2620,7 @@ class Joueur(Entité):
             
             self.armes = [arme]
         
-        # self.armes = [Arme("Cadeau")]
+        # self.armes = [Arme("Sel")]
     
     def initialiser_monde(self):
         """ Joueur -> None
@@ -2978,7 +2986,7 @@ class Arme:
 
         self.modèle: list[tuple[int, int]] = exécuter_sql(f"""SELECT CasesViseesArme.x, CasesViseesArme.y FROM CasesViseesArme JOIN Arme ON Arme.nom = CasesViseesArme.arme WHERE Arme.nom = '{self.nom}';""")
 
-        centre_x, centre_y, centree_joueur, puissance, duree, attente, vitesse, projectiles, invocation = exécuter_sql(f"""SELECT centre_x, centre_y, centree_joueur, puissance, duree, attente, vitesse, projectiles, invocation FROM Arme WHERE nom = '{self.nom}';""")[0]
+        centre_x, centre_y, centree_joueur, puissance, duree, attente, vitesse, projectiles, invocation, dispersion = exécuter_sql(f"""SELECT centre_x, centre_y, centree_joueur, puissance, duree, attente, vitesse, projectiles, invocation, dispersion FROM Arme WHERE nom = '{self.nom}';""")[0]
         
         self.centre: tuple[int, int] = centre_x, centre_y
         self.centrée_joueur = bool(centree_joueur)
@@ -2988,6 +2996,7 @@ class Arme:
         self.vitesse: int = vitesse
         self.projectiles: int = projectiles
         self.invocation: int = invocation
+        self.dispersion: int = dispersion
 
         self.monde: list[str] = [monde[0] for monde in exécuter_sql(f"""SELECT monde FROM MondeArme WHERE arme = '{self.nom}';""")]
 
