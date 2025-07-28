@@ -1661,13 +1661,13 @@ class GestionnaireStatistiques:
                 valeur = sql[0][0]
 
                 if sous_catégorie == 'maximum':
-                    maximum = round(valeur * 1.1**(difficulté_monde/6) * (1 + ({"vie": 1.75, "puissance_physique": 1., "vitesse_physique": 0., "vitesse_deplacement": .5}[catégorie] * (3 - difficulté) / 3) if type(entité) is Joueur else 1.))
+                    maximum = round(valeur * 1.1**(difficulté_monde/6) * (1. + ({"vie": 2.5, "puissance_physique": 1.25, "vitesse_physique": 0., "vitesse_deplacement": .75}[catégorie] * (5 - difficulté) / 4) if type(entité) is Joueur else 1.))
                     if type(entité) is Boss and catégorie == "vie":
-                        maximum *= 10
+                        maximum *= 15
                 
                 elif sous_catégorie == 'division':
                     if type(entité) is Joueur and catégorie == "vie":
-                        division = 5 - difficulté
+                        division = 2 + difficulté
                     else:
                         division = valeur
                 
@@ -1677,7 +1677,7 @@ class GestionnaireStatistiques:
                         if type(entité) is Boss:
                             régénération = 0
                         elif type(entité) is Joueur:
-                            régénération = 4 - difficulté
+                            régénération = 7 - 2 * difficulté
                 
                 elif sous_catégorie == 'valeur_depart':
                     valeur_départ = valeur
@@ -1986,9 +1986,9 @@ class Entité:
                         if possède_améliorations(self.enchantements, [10]):
                             effets["Froid"] = max(effets.get("Froid",0), 2000)
                             
-                        cout_critique = 1
-                        chiffre = random.uniform(0,1)
-                        if chiffre >= 1 - nombre_améliorations(self.enchantements, [1, 2001, 1001]) * 0.2 and type(self) is Joueur and possède_améliorations(self.enchantements, [1, 2001, 1001]):
+                        cout_critique = 1.
+                        chiffre = random.uniform(0, 1)
+                        if chiffre >= 1. - nombre_améliorations(self.enchantements, [1, 2001, 1001]) * 0.2 and type(self) is Joueur and possède_améliorations(self.enchantements, [1, 2001, 1001]):
                             cout_critique = 1.2
                         dégat = cout_critique * self.arme.puissance * self.statistiques.puissance_physique.valeur / 1000 * (1.25 if (isinstance(self, Monstre) and self.effets.contient("Obscurite")) else 1)
                         attaques.ajouter(Attaque(x_final, y_final, dégat, self.arme.durée, self.arme.attente, self.arme.monde, immunisés={type(self)}, effets=effets, attaquant=self))
@@ -2082,7 +2082,7 @@ class GestionnaireEntités:
                 if salle.boss:
                     self.ajouter_monstre(x, y, salle, boss=True)
                 elif salle.est_dangereuse():
-                    for _ in range(math.ceil(salle.difficulté / 2.5)):
+                    for _ in range(math.ceil(salle.difficulté / (4 - (difficulté/2)))):
                         self.ajouter_monstre(x, y, salle)
                 else:
                     self.ajouter_joueur(x, y, salle)
@@ -2523,7 +2523,8 @@ class Monstre(Entité):
             if not self.salle.est_visible(self.x // taille_salle, self.y // taille_salle):
                 return
 
-            if  (self.effets.contient("Obscurite") or self.arme.nom == "Sel") or ((self.arme.puissance == 0 or self.joueur_à_portée() or (type(self) is Boss and (.5 / horloge.get_fps()) >= random.random())) and distance(self.coordonnées_affichage(), (joueur_x, joueur_y)) <= 6 * taille_case):
+            global difficulté
+            if  (self.effets.contient("Obscurite") or self.arme.nom == "Sel") or ((self.arme.puissance == 0 or self.joueur_à_portée() or (type(self) is Boss and (1 / horloge.get_fps() * (2.5 - (difficulté/2))) >= random.random())) and distance(self.coordonnées_affichage(), (joueur_x, joueur_y)) <= 6 * taille_case):
                 self.attaquer(joueur_x, joueur_y)
                 self.inventaire.enfiler(self.inventaire.defiler())
                 self.arme = self.inventaire.tete()
@@ -2611,7 +2612,7 @@ class Joueur(Entité):
             
             self.armes = [arme]
         
-        # self.armes = [Arme("Feuilles")]
+        # self.armes = [Arme("Cadeau")]
     
     def initialiser_monde(self):
         """ Joueur -> None
